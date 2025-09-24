@@ -1,53 +1,137 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AuthState, CartState, Product, CartItem, User } from '@/types';
+import { CartState, Product, CartItem } from '@/types';
+import { supabase, getCurrentUser, getUserProfile, UserProfile } from './supabase';
+import { User } from '@supabase/supabase-js';
 
-// Auth Store
+// Updated Auth State interface
+interface AuthState {
+  user: User | null;
+  userProfile: UserProfile | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => Promise<void>;
+  initializeAuth: () => Promise<void>;
+}
+
+// Auth Store using Supabase
 const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
-      token: null,
+      userProfile: null,
       isAuthenticated: false,
+      loading: true,
       login: async (email: string, password: string) => {
         try {
-          // This would call your API
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
           });
           
-          if (!response.ok) throw new Error('Login failed');
+          if (error) throw error;
           
-          const { user, token } = await response.json();
-          set({ user, token, isAuthenticated: true });
-        } catch (error) {
-          throw error;
+          if (data.user) {
+            const profile = await getUserProfile(data.user.id);
+            set({ 
+              user: data.user, 
+              userProfile: profile,
+              isAuthenticated: true,
+              loading: false 
+            });
+          }
+        } catch (error: any) {
+          console.error('Login error:', error);
+          throw new Error(error.message || 'Login failed');
         }
       },
       register: async (email: string, password: string, name: string) => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, name }),
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name,
+              }
+            }
           });
           
-          if (!response.ok) throw new Error('Registration failed');
+          if (error) throw error;
           
-          const { user, token } = await response.json();
-          set({ user, token, isAuthenticated: true });
-        } catch (error) {
-          throw error;
+          if (data.user) {
+            // The user profile will be created automatically via database trigger
+            // Wait a moment for the trigger to complete
+            setTimeout(async () => {
+              const profile = await getUserProfile(data.user!.id);
+              set({ 
+                user: data.user, 
+                userProfile: profile,
+                isAuthenticated: true,
+                loading: false 
+              });
+            }, 1000);
+          }
+        } catch (error: any) {
+          console.error('Registration error:', error);
+          throw new Error(error.message || 'Registration failed');
         }
       },
-      logout: () => {
-        set({ user: null, token: null, isAuthenticated: false });
+      logout: async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          
+          set({ 
+            user: null, 
+            userProfile: null, 
+            isAuthenticated: false,
+            loading: false 
+          });
+        } catch (error: any) {
+          console.error('Logout error:', error);
+        }
+      },
+      initializeAuth: async () => {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          
+          if (error) {
+            console.error('Auth initialization error:', error);
+            set({ loading: false });
+            return;
+          }
+          
+          if (user) {
+            const profile = await getUserProfile(user.id);
+            set({ 
+              user, 
+              userProfile: profile,
+              isAuthenticated: true,
+              loading: false 
+            });
+          } else {
+            set({ 
+              user: null, 
+              userProfile: null, 
+              isAuthenticated: false,
+              loading: false 
+            });
+          }
+        } catch (error) {
+          console.error('Auth initialization error:', error);
+          set({ loading: false });
+        }
       },
     }),
     {
       name: 'auth-storage',
+      partialize: (state) => ({ 
+        // Only persist essential data, not the full user object
+        isAuthenticated: state.isAuthenticated 
+      }),
     }
   )
 );

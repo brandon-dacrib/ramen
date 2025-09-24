@@ -1,0 +1,41 @@
+# FlavorCraft - Robots.txt
+
+User-agent: *
+Allow: /
+
+# Optimize crawling
+Allow: /products
+Allow: /products/*
+Allow: /about
+Allow: /api/products
+
+# Block admin and private areas
+Disallow: /admin
+Disallow: /api/auth
+Disallow: /api/orders
+Disallow: /profile
+Disallow: /cart
+Disallow: /checkout
+
+# Block development files
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://flavorcraft.com/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: facebookexternalhit
+Allow: /

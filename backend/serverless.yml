@@ -9,8 +9,8 @@ provider:
   region: ${opt:region, 'us-east-1'}
   environment:
     NODE_ENV: ${self:provider.stage}
-    MONGODB_URI: ${env:MONGODB_URI}
-    JWT_SECRET: ${env:JWT_SECRET}
+    SUPABASE_URL: ${env:SUPABASE_URL}
+    SUPABASE_SERVICE_ROLE_KEY: ${env:SUPABASE_SERVICE_ROLE_KEY}
     STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
     CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
   

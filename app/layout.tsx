@@ -5,13 +5,13 @@ import Footer from '@/components/Footer';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'RamenShop - Premium Ramen Noodle Packets',
-  description: 'Discover the finest selection of ramen noodle packets from around the world. Authentic flavors, premium quality, fast delivery.',
-  keywords: 'ramen, noodles, instant noodles, asian food, ramen packets',
-  authors: [{ name: 'RamenShop Team' }],
+  title: 'FlavorCraft - Premium Ramen Flavor Packets',
+  description: 'Transform your noodles with authentic ramen flavor packets from around the world. We sell concentrated flavor sachets - just add your own noodles!',
+  keywords: 'ramen flavor packets, flavor sachets, seasoning packets, ramen seasoning, instant ramen flavoring, asian seasonings',
+  authors: [{ name: 'FlavorCraft Team' }],
   openGraph: {
-    title: 'RamenShop - Premium Ramen Noodle Packets',
-    description: 'Discover the finest selection of ramen noodle packets from around the world.',
+    title: 'FlavorCraft - Premium Ramen Flavor Packets',
+    description: 'Transform your noodles with authentic ramen flavor packets from around the world. Premium concentrated seasonings for the perfect bowl.',
     type: 'website',
     locale: 'en_US',
   },

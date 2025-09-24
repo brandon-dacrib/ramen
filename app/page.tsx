@@ -59,7 +59,58 @@ export default function HomePage() {
     setFeaturedProducts(mockProducts.filter(p => p.featured));
   }, []);
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FlavorCraft",
+    "description": "Premium ramen flavor packets from around the world",
+    "url": "https://flavorcraft.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://flavorcraft.com/products?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "FlavorCraft",
+      "description": "Premium ramen flavor packet retailer",
+      "url": "https://flavorcraft.com"
+    }
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FlavorCraft",
+    "description": "Premium ramen flavor packets from around the world",
+    "url": "https://flavorcraft.com",
+    "logo": "https://flavorcraft.com/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-FLAVOR",
+      "contactType": "customer service"
+    },
+    "sameAs": [
+      "https://twitter.com/flavorcraft",
+      "https://facebook.com/flavorcraft",
+      "https://instagram.com/flavorcraft"
+    ]
+  };
+
   return (
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+      />
+      
+      {/* Page Content */}
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
